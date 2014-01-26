@@ -50,13 +50,15 @@ void Example24() {
 	vv101 += 1,0,1;
 	vv111 += 1,1,1;
 
+
+	// copy to boost vectors of the Paar objects & assigning output values
 	copyToBoost(vv001,p0.input); p0.output = 0;
 	copyToBoost(vv011,p1.input); p1.output = 0;
 	copyToBoost(vv101,p2.input); p2.output = 0;
 	copyToBoost(vv111,p3.input); p3.output = 1;
 
+	// creating list for input Pairs and filling it with all the inputs
 	std::vector<Paar*> paarList;
-
 	paarList.push_back(&p0);
 	paarList.push_back(&p1);
 	paarList.push_back(&p2);
@@ -66,9 +68,10 @@ void Example24() {
 		std::cout << paarList[i]->input << std::endl;
 	}*/
 
-	double eta = 0.2;
-	boost::numeric::ublas::vector<double> w(3);
+	double eta = 0.2; // learning rate eta
 
+	// w = weights of the single inputs - initialized with random numbers
+	boost::numeric::ublas::vector<double> w(3);
 	for (unsigned int i = 0; i<w.size(); i++) {
 		w(i) = RandomNGenerator::returnRandomD(0,1);
 	}
@@ -79,6 +82,8 @@ void Example24() {
 	//std::cout << v101 << std::endl;
 	//std::cout << v111 << std::endl;
 
+
+	// learning steps - chose a pair randomly and test it's input with the current weights and compare to target value. UnitStep is the learning function
 	for (unsigned int i = 0; i<M; i++) {
 		Paar* cur = paarList[RandomNGenerator::returnRandomI(0,3)];
 		double y = boost::numeric::ublas::inner_prod(w,cur->input);
