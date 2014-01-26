@@ -2,10 +2,7 @@
     CONSOLE APPLICATION : Perzeptron Project Overview
 ========================================================================
 
-AppWizard has created this Perzeptron application for you.
-
-This file contains a summary of what you will find in each of the files that
-make up your Perzeptron application.
+Program that simulates the behaviour of a neuron (or a collection of neurons) - based on the theory of a perceptron.
 
 
 Perzeptron.vcxproj
@@ -23,13 +20,6 @@ Perzeptron.vcxproj.filters
 
 Perzeptron.cpp
     This is the main application source file.
-
-/////////////////////////////////////////////////////////////////////////////
-Other standard files:
-
-StdAfx.h, StdAfx.cpp
-    These files are used to build a precompiled header (PCH) file
-    named Perzeptron.pch and a precompiled types file named StdAfx.obj.
 
 /////////////////////////////////////////////////////////////////////////////
 Other notes:
