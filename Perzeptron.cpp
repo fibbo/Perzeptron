@@ -6,7 +6,7 @@
 #include <math.h>
 
 
-#define N 3
+
 #define M 1500000
 
 using namespace boost::assign;
@@ -24,10 +24,14 @@ int UnitStep(double x) {
 	else return 0;
 }
 
-void copyToBoost(std::vector<int> source, boost::numeric::ublas::vector<int> &result) {
+void copyToBoost(std::vector<double> source, boost::numeric::ublas::vector<double> &result) {
 		for (unsigned int i = 0; i < source.size(); i++) {
 		result[i] = source[i];
 	}
+}
+
+double sigmoid(double x) {
+	return 1/(1+exp(-x));
 }
 
 double f(double x) {
@@ -40,11 +44,12 @@ double fprime(double x) {
 	return a*f(x)*(1-f(x));
 }
 void Example24() {
+	int N = 3;
 	Paar p0(N), p1(N), p2(N), p3(N);
 	
 	
 	// intermediate vectors - easier to assign a list of values. they then get copied to boost vectors
-	std::vector<int> vv001, vv011, vv101, vv111;
+	std::vector<double> vv001, vv011, vv101, vv111;
 	vv001 += 0,0,1;
 	vv011 += 0,1,1;
 	vv101 += 1,0,1;
@@ -100,11 +105,12 @@ void Example24() {
 }
 
 void Example28() {
+	int N = 3;
 	Paar p0(N), p1(N), p2(N), p3(N);
 	
 	
 	// intermediate vectors - easier to assign a list of values. they then get copied to boost vectors
-	std::vector<int> vv001, vv011, vv101, vv111;
+	std::vector<double> vv001, vv011, vv101, vv111;
 	vv001 += 0,0,1;
 	vv011 += 0,1,1;
 	vv101 += 1,0,1;
@@ -153,6 +159,78 @@ void Example28() {
 	}
 	std::cout << "########" << std::endl;
 }
+
+void Example29() {
+	int N = 9;
+	Paar p0(N), p1(N), p2(N), p3(N), p4(N), p5(N), p6(N), p7(N), p8(N);
+	
+	
+	// intermediate vectors - easier to assign a list of values. they then get copied to boost vectors
+	std::vector<double> vvC0, vvC1, vvC2, vvC3, vvT0, vvT1, vvT2, vvT3;
+	vvC0 += 0.9, 0.9, 0.9, 0.9, 0.1, 0.1, 0.9, 0.9, 0.9;
+	vvC1 += 0.9, 0.9, 0.9, 0.9, 0.1, 0.9, 0.9, 0.1, 0.9;
+	vvC2 += 0.9, 0.9, 0.9, 0.1, 0.1, 0.9, 0.9, 0.9, 0.9;
+	vvC3 += 0.9, 0.1, 0.9, 0.9, 0.1, 0.9, 0.9, 0.9, 0.9;
+
+	vvT0 += 0.9, 0.9, 0.9, 0.1, 0.9, 0.1, 0.1, 0.9, 0.1;
+	vvT1 += 0.1, 0.1, 0.9, 0.9, 0.9, 0.9, 0.1, 0.1, 0.9;
+	vvT2 += 0.1, 0.9, 0.1, 0.1, 0.9, 0.1, 0.9, 0.9, 0.9;
+	vvT3 += 0.9, 0.1, 0.1, 0.9, 0.9, 0.9, 0.9, 0.1, 0.1;
+
+	copyToBoost(vvC0,p0.input); p0.output = 0.1;
+	copyToBoost(vvC1,p1.input); p1.output = 0.1;
+	copyToBoost(vvC2,p2.input); p2.output = 0.1;
+	copyToBoost(vvC3,p3.input); p3.output = 0.1;
+
+	copyToBoost(vvT0,p4.input); p4.output = 0.9;
+	copyToBoost(vvT1,p5.input); p5.output = 0.9;
+	copyToBoost(vvT2,p6.input); p6.output = 0.9;
+	copyToBoost(vvT3,p7.input); p7.output = 0.9;
+
+
+	std::vector<Paar*> paarList;
+
+	paarList.push_back(&p0);
+	paarList.push_back(&p1);
+	paarList.push_back(&p2);
+	paarList.push_back(&p3);
+	paarList.push_back(&p4);
+	paarList.push_back(&p5);
+	paarList.push_back(&p6);
+	paarList.push_back(&p7);
+
+	/*for (unsigned int i = 0; i<4; i++) {
+		std::cout << paarList[i]->input << std::endl;
+	}*/
+	unsigned int innum = 9, hidnum = 3, outnum = 1;
+	double eta = 0.5;
+	boost::numeric::ublas::vector<double> w(3);
+
+	for (unsigned int i = 0; i<w.size(); i++) {
+		w(i) = RandomNGenerator::returnRandomD(0,1);
+	}
+
+	//std::cout << w << std::endl;
+	//std::cout << v001 << std::endl;
+	//std::cout << v011 << std::endl;
+	//std::cout << v101 << std::endl;
+	//std::cout << v111 << std::endl;
+
+	for (unsigned int i = 0; i<M; i++) {
+		Paar* cur = paarList[RandomNGenerator::returnRandomI(0,3)];
+		double y = boost::numeric::ublas::inner_prod(w,cur->input);
+		double e = cur->output - f(y);
+		w += eta*e*fprime(y)*cur->input;
+		cur = NULL;
+		delete cur;
+	}
+
+	for (unsigned int i=0; i<4; i++) {
+		std::cout << f(boost::numeric::ublas::inner_prod(w, paarList[i]->input)) << std::endl;
+	}
+	std::cout << "########" << std::endl;
+}
+
 
 int main() {
 	for (unsigned int i = 0; i<1; i++) {

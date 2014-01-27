@@ -6,8 +6,8 @@ class Paar {
 public:
 	Paar(int n) { input.resize(n);
 	}
-	boost::numeric::ublas::vector< int > input;
-	int output;
+	boost::numeric::ublas::vector< double > input;
+	double output;
 private:
 
 };
