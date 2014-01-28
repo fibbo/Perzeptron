@@ -1,5 +1,4 @@
 #include <boost/numeric/ublas/vector.hpp>
-#include <boost/assign/std/vector.hpp>
 #include <boost/numeric/ublas/io.hpp>
 
 class Paar {
@@ -12,6 +11,3 @@ private:
 
 };
 
-/* int UnitStep(double x) {
- return (x>0);
- } */
