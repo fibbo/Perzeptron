@@ -13,7 +13,6 @@
 #define M 1500000
 
 using namespace boost::assign;
-using namespace boost::numeric::ublas;
 
 void PressEnterToContinue()
   {
@@ -37,11 +36,11 @@ double sigmoid(double x) {
 	return 1/(1+exp(-x));
 }
 
-vector<double> sigmoid(vector<double> x) {
-	vector<double> result(x.size());
+boost::numeric::ublas::vector<double> * sigmoid(boost::numeric::ublas::vector<double> x) {
+	boost::numeric::ublas::vector<double>* result = new boost::numeric::ublas::vector<double>(x.size());
 	for (unsigned int i = 0; i<x.size();i++) 
 	{
-		result[i] = 1/(1+exp(-x[i]));
+		result[i] = 1/(1+exp(-x[i])); // find a solution for vector function
 	}
 	return result;
 }
@@ -57,7 +56,7 @@ double fprime(double x) {
 	return a*f(x)*(1-f(x));
 }
 
-void initWeights(matrix<double> &m) {
+void initWeights(boost::numeric::ublas::matrix<double> &m) {
 	for (unsigned i = 0; i < m.size1 (); ++ i)
         for (unsigned j = 0; j < m.size2 (); ++ j)
             m (i, j) = RandomNGenerator::returnRandomD(-0.1, 0.1);
@@ -96,7 +95,7 @@ void Example24() {
 	double eta = 0.2; // learning rate eta
 
 	// w = weights of the single inputs - initialized with random numbers
-	vector<double> w(3);
+	boost::numeric::ublas::vector<double> w(3);
 	for (unsigned int i = 0; i<w.size(); i++) {
 		w(i) = RandomNGenerator::returnRandomD(0,1);
 	}
@@ -153,7 +152,7 @@ void Example28() {
 	}*/
 
 	double eta = 0.5;
-	vector<double> w(3);
+	boost::numeric::ublas::vector<double> w(3);
 
 	for (unsigned int i = 0; i<w.size(); i++) {
 		w(i) = RandomNGenerator::returnRandomD(0,1);
@@ -219,53 +218,37 @@ void Example29() {
 	paarList.push_back(&p6);
 	paarList.push_back(&p7);
 
-	/*for (unsigned int i = 0; i<4; i++) {
+	for (unsigned int i = 0; i<4; i++) {
 		std::cout << paarList[i]->input << std::endl;
-	}*/
+	}
 	unsigned int innum = 9, hidnum = 3, outnum = 1;
-	matrix<double> wh (innum, hidnum);
-	matrix<double> wo (hidnum, outnum);
+	boost::numeric::ublas::matrix<double> wh (innum, hidnum);
+	boost::numeric::ublas::matrix<double> wo (hidnum, outnum);
 	initWeights(wh); initWeights(wo);
 	double eta = 0.5;
 
-	/*
-	vector<double> w(3);
-
-	for (unsigned int i = 0; i<w.size(); i++) {
-		w(i) = RandomNGenerator::returnRandomD(0,1);
-	}
-
-	//std::cout << w << std::endl;
-	//std::cout << v001 << std::endl;
-	//std::cout << v011 << std::endl;
-	//std::cout << v101 << std::endl;
-	//std::cout << v111 << std::endl;
-	*/
 	for (unsigned int i = 0; i<M; i++) {
 		Paar* cur = paarList[RandomNGenerator::returnRandomI(0,7)];
-		vector<double> outhid = sigmoid(prod(wh,cur->input)); // length of this vector is 'hidnum'
-		vector<double> out = sigmoid(prod(wo,outhid)); // out is usually of length 1 because the final output is just from one neuron
-		vector<double> e = vector<double>(vector<double>(cur->output) - out); // e is also of length one
-		vector<double> outdelta = vector<double>(e[0]*out[0]*(1-out[0]));
-		vector<double> onevec(hidnum,1);
-		vector<double> hiddelta = inner_prod(outhid,(onevec-outhid))*prod(trans(wo),outdelta);
+		boost::numeric::ublas::vector<double> outhid = sigmoid(prod(wh,cur->input)); // length of this vector is 'hidnum'
+		//boost::numeric::ublas::vector<double> out = sigmoid(prod(wo,outhid)); // out is usually of length 1 because the final output is just from one neuron
+		//boost::numeric::ublas::vector<double> e = boost::numeric::ublas::vector<double>(boost::numeric::ublas::vector<double>(cur->output) - out); // e is also of length one
+		//boost::numeric::ublas::vector<double> outdelta = boost::numeric::ublas::vector<double>(e[0]*out[0]*(1-out[0]));
+		//boost::numeric::ublas::vector<double> onevec(hidnum,1);
+		//boost::numeric::ublas::vector<double> hiddelta = inner_prod(outhid,(onevec-outhid))*prod(trans(wo),outdelta);
 		/* #####  part below TBD  ##### */
-		w += eta*e*fprime(y)*cur->input;
-		cur = NULL;
-		delete cur;
-	}
 
-	for (unsigned int i=0; i<4; i++) {
-		std::cout << f(inner_prod(w, paarList[i]->input)) << std::endl;
 	}
+	
 	std::cout << "########" << std::endl;
 }
 
 
 int main() {
-	for (unsigned int i = 0; i<1; i++) {
+	/*for (unsigned int i = 0; i<1; i++) {
 		Example28();
-	}
+	}*/
+			//boost::numeric::ublas::vector<double> onevec(3);
+			std::cout << "1";
 	PressEnterToContinue();
 return 0;
 }

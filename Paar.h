@@ -6,7 +6,7 @@ public:
 	Paar(int n) { input.resize(n);
 	}
 	boost::numeric::ublas::vector< double > input;
-	double output;
+	double  output;
 private:
 
 };
