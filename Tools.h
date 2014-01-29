@@ -1,3 +1,5 @@
+/* A General library of often used functions such as random numbers, waiting for enter */
+
 #include <random>
 
 class Tools {

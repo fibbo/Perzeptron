@@ -1,5 +1,6 @@
 #include <iostream>
 #include <vector>
+#include <boost/assign/std/vector.hpp>
 #include "Paar.h"
 #include "Tools.h"
 
@@ -206,41 +207,51 @@ void Example29() {
 	paarList.push_back(&p6);
 	paarList.push_back(&p7);
 
-	for (unsigned int i = 0; i<4; i++) {
-		std::cout << paarList[i]->input << std::endl;
-	}
 	unsigned int innum = 9, hidnum = 3, outnum = 1;
-	matrix<double> wh (innum, hidnum);
-	matrix<double> wo (hidnum, outnum);
+	matrix<double> wh (hidnum, innum);
+	matrix<double> wo (outnum, hidnum);
 	initWeights(wh); initWeights(wo);
 	double eta = 0.5;
 
-	for (unsigned int i = 0; i<M; i++) {
+	for (unsigned int i = 0; i<5000; i++) {
 		Paar* cur = paarList[Tools::returnRandomI(0,7)];
 		vector<double> xx = prod(wh,cur->input);
 		vector<double> outhid(hidnum);
-		sigmoid(xx,outhid); // length of this vector is 'hidnum'
+		sigmoid(xx,outhid); 
 		vector<double> out(outnum);
 		xx = prod(wo,outhid);
 		sigmoid(xx,out); // out is usually of length 1 because the final output is just from one neuron
-		vector<double> e = vector<double>(vector<double>(cur->output) - out); // e is also of length one
-		vector<double> outdelta = vector<double>(e[0]*out[0]*(1-out[0]));
+		vector<double> curout(1,cur->output);
+		vector<double> e = vector<double>(curout - out); // e is also of length one
+		vector<double> outdelta(1,e[0]*out[0]*(1-out[0]));
 		vector<double> onevec(hidnum,1);
 		vector<double> hiddelta = inner_prod(outhid,(onevec-outhid))*prod(trans(wo),outdelta);
+
+		wo += eta*outer_prod(outdelta,outhid);
+		wh += eta*outer_prod(hiddelta,cur->input);
 		/* #####  part below TBD  ##### */
 
 	}
 	
 	std::cout << "########" << std::endl;
+	Paar* cur = paarList[4];
+	vector<double> xx = prod(wh,cur->input);
+	vector<double> outhid(hidnum);
+	sigmoid(xx,outhid); 
+	vector<double> out(outnum);
+	xx = prod(wo,outhid);
+	sigmoid(xx,out);
+
+	std::cout << out << std::endl;
+	
 }
 
 
 int main() {
-	/*for (unsigned int i = 0; i<1; i++) {
-		Example28();
-	}*/
-			//vector<double> onevec(3);
-			std::cout << "1";
+	for (unsigned int i = 0; i<1; i++) {
+		Example29();
+	}
+
 	Tools::PressEnterToContinue();
 return 0;
 }
