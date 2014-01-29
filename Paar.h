@@ -1,5 +1,10 @@
+#include <stdio.h>
+#include <math.h>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/assign/std/vector.hpp>
 #include <boost/numeric/ublas/vector.hpp>
 #include <boost/numeric/ublas/io.hpp>
+#include <fstream>
 
 class Paar {
 public:
@@ -10,4 +15,3 @@ public:
 private:
 
 };
-

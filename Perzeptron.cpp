@@ -1,32 +1,23 @@
 #include <iostream>
 #include <vector>
 #include "Paar.h"
-#include <stdio.h>
-#include "random_gen.h"
-#include <math.h>
-#include <boost/numeric/ublas/matrix.hpp>
-#include <boost/assign/std/vector.hpp>
-#include <fstream>
+#include "Tools.h"
+
 
 
 
 #define M 1500000
 
 using namespace boost::assign;
+using namespace boost::numeric::ublas;
 
-void PressEnterToContinue()
-  {
-  int c;
-  printf( "Press ENTER to continue... " );
-  fflush( stdout );
-  do c = getchar(); while ((c != '\n') && (c != EOF));
-  }
+
 
  int UnitStep(double x) {
 	return (x>0);
  } 
 
-void copyToBoost(std::vector<double> source, boost::numeric::ublas::vector<double> &result) {
+void copyToBoost(std::vector<double> source, vector<double> &result) {
 		for (unsigned int i = 0; i < source.size(); i++) {
 		result[i] = source[i];
 	}
@@ -36,13 +27,10 @@ double sigmoid(double x) {
 	return 1/(1+exp(-x));
 }
 
-boost::numeric::ublas::vector<double> * sigmoid(boost::numeric::ublas::vector<double> x) {
-	boost::numeric::ublas::vector<double>* result = new boost::numeric::ublas::vector<double>(x.size());
-	for (unsigned int i = 0; i<x.size();i++) 
-	{
-		result[i] = 1/(1+exp(-x[i])); // find a solution for vector function
-	}
-	return result;
+void sigmoid(vector<double> &x, vector<double> &y) {
+  for (unsigned int i = 0; i<x.size(); i++) {
+    y[i] = 1/(1+exp(-x[i]));
+  }
 }
 
 
@@ -56,10 +44,10 @@ double fprime(double x) {
 	return a*f(x)*(1-f(x));
 }
 
-void initWeights(boost::numeric::ublas::matrix<double> &m) {
+void initWeights(matrix<double> &m) {
 	for (unsigned i = 0; i < m.size1 (); ++ i)
         for (unsigned j = 0; j < m.size2 (); ++ j)
-            m (i, j) = RandomNGenerator::returnRandomD(-0.1, 0.1);
+            m (i, j) = Tools::returnRandomD(-0.1, 0.1);
 }
 
 void Example24() {
@@ -95,9 +83,9 @@ void Example24() {
 	double eta = 0.2; // learning rate eta
 
 	// w = weights of the single inputs - initialized with random numbers
-	boost::numeric::ublas::vector<double> w(3);
+	vector<double> w(3);
 	for (unsigned int i = 0; i<w.size(); i++) {
-		w(i) = RandomNGenerator::returnRandomD(0,1);
+		w(i) = Tools::returnRandomD(0,1);
 	}
 
 	//std::cout << w << std::endl;
@@ -109,9 +97,9 @@ void Example24() {
 
 	// learning steps - chose a pair randomly and test it's input with the current weights and compare to target value. UnitStep is the learning function
 	for (unsigned int i = 0; i<M; i++) {
-		Paar* cur = paarList[RandomNGenerator::returnRandomI(0,3)];
+		Paar* cur = paarList[Tools::returnRandomI(0,3)];
 		double y = inner_prod(w,cur->input);
-		int e = cur->output - UnitStep(y);
+		int e = (int)(cur->output) - UnitStep(y);
 		w += eta*e*cur->input;
 		cur = NULL;
 		delete cur;
@@ -152,10 +140,10 @@ void Example28() {
 	}*/
 
 	double eta = 0.5;
-	boost::numeric::ublas::vector<double> w(3);
+	vector<double> w(3);
 
 	for (unsigned int i = 0; i<w.size(); i++) {
-		w(i) = RandomNGenerator::returnRandomD(0,1);
+		w(i) = Tools::returnRandomD(0,1);
 	}
 
 	//std::cout << w << std::endl;
@@ -165,7 +153,7 @@ void Example28() {
 	//std::cout << v111 << std::endl;
 
 	for (unsigned int i = 0; i<M; i++) {
-		Paar* cur = paarList[RandomNGenerator::returnRandomI(0,3)];
+		Paar* cur = paarList[Tools::returnRandomI(0,3)];
 		double y = inner_prod(w,cur->input);
 		double e = cur->output - f(y);
 		w += eta*e*fprime(y)*cur->input;
@@ -222,19 +210,23 @@ void Example29() {
 		std::cout << paarList[i]->input << std::endl;
 	}
 	unsigned int innum = 9, hidnum = 3, outnum = 1;
-	boost::numeric::ublas::matrix<double> wh (innum, hidnum);
-	boost::numeric::ublas::matrix<double> wo (hidnum, outnum);
+	matrix<double> wh (innum, hidnum);
+	matrix<double> wo (hidnum, outnum);
 	initWeights(wh); initWeights(wo);
 	double eta = 0.5;
 
 	for (unsigned int i = 0; i<M; i++) {
-		Paar* cur = paarList[RandomNGenerator::returnRandomI(0,7)];
-		boost::numeric::ublas::vector<double> outhid = sigmoid(prod(wh,cur->input)); // length of this vector is 'hidnum'
-		//boost::numeric::ublas::vector<double> out = sigmoid(prod(wo,outhid)); // out is usually of length 1 because the final output is just from one neuron
-		//boost::numeric::ublas::vector<double> e = boost::numeric::ublas::vector<double>(boost::numeric::ublas::vector<double>(cur->output) - out); // e is also of length one
-		//boost::numeric::ublas::vector<double> outdelta = boost::numeric::ublas::vector<double>(e[0]*out[0]*(1-out[0]));
-		//boost::numeric::ublas::vector<double> onevec(hidnum,1);
-		//boost::numeric::ublas::vector<double> hiddelta = inner_prod(outhid,(onevec-outhid))*prod(trans(wo),outdelta);
+		Paar* cur = paarList[Tools::returnRandomI(0,7)];
+		vector<double> xx = prod(wh,cur->input);
+		vector<double> outhid(hidnum);
+		sigmoid(xx,outhid); // length of this vector is 'hidnum'
+		vector<double> out(outnum);
+		xx = prod(wo,outhid);
+		sigmoid(xx,out); // out is usually of length 1 because the final output is just from one neuron
+		vector<double> e = vector<double>(vector<double>(cur->output) - out); // e is also of length one
+		vector<double> outdelta = vector<double>(e[0]*out[0]*(1-out[0]));
+		vector<double> onevec(hidnum,1);
+		vector<double> hiddelta = inner_prod(outhid,(onevec-outhid))*prod(trans(wo),outdelta);
 		/* #####  part below TBD  ##### */
 
 	}
@@ -247,9 +239,9 @@ int main() {
 	/*for (unsigned int i = 0; i<1; i++) {
 		Example28();
 	}*/
-			//boost::numeric::ublas::vector<double> onevec(3);
+			//vector<double> onevec(3);
 			std::cout << "1";
-	PressEnterToContinue();
+	Tools::PressEnterToContinue();
 return 0;
 }
 

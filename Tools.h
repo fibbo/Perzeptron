@@ -1,6 +1,6 @@
 #include <random>
 
-class RandomNGenerator {
+class Tools {
 
 public:
 	static double returnRandomD(double start, double end) {
@@ -16,4 +16,11 @@ public:
 		std::uniform_int_distribution<> dis(start,end);
 		return dis(gen);
 	}
+
+	static void PressEnterToContinue() {
+		int c;
+		printf( "Press ENTER to continue... " );
+		fflush( stdout );
+		do c = getchar(); while ((c != '\n') && (c != EOF));
+  }
 };

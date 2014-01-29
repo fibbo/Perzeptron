@@ -29,7 +29,7 @@
     <ClInclude Include="Paar.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="random_gen.h">
+    <ClInclude Include="Tools.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
