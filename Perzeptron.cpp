@@ -383,13 +383,13 @@ void Example29b_mom_term() {
 	paarList.push_back(&p7);
 
 	unsigned int innum = 9, hidnum = 3, outnum = 1; // innum = number of inputs, hidnum = number of hidden neurons, outnum = number of outputs
-	double m = 0.2; //momentum term
-	matrix<double> wh (hidnum, innum), wo (outnum, hidnum), wh_old(hidnum, innum), wo_old(outnum, hidnum); //weight matrices for the hidden layer and the output layer
+	double m = 0.6; //momentum term
+	matrix<double> wh (hidnum, innum), wo (outnum, hidnum), wh_old(hidnum, innum,0), wo_old(outnum, hidnum,0); //weight matrices for the hidden layer and the output layer
 	initWeights(wh); initWeights(wo);
 	double eta = 0.5; //learning rate
 	std::ofstream errorfile, outputfile;
-	errorfile.open ("example29bmomterm_error.txt");
-	outputfile.open ("example29bmomterm_output.txt");
+	errorfile.open ("example29bmomterm6_error.txt");
+	outputfile.open ("example29bmomterm6_output.txt");
 	
 	
 
@@ -406,14 +406,10 @@ void Example29b_mom_term() {
 		vector<double> outdelta(1,e[0]*out[0]*(1-out[0]));
 		vector<double> onevec(hidnum,1);
 		vector<double> hiddelta = inner_prod(outhid,(onevec-outhid))*prod(trans(wo),outdelta);
-		if (i > 0) {
-			wo += eta*outer_prod(outdelta,outhid) + m*wo_old;       //momentum term added
-			wh += eta*outer_prod(hiddelta,cur->input) + m*wh_old;   //momentum term added
-		}
-		else {
-			wo += eta*outer_prod(outdelta,outhid);
-			wh += eta*outer_prod(hiddelta,cur->input);
-		}
+
+		wo += eta*outer_prod(outdelta,outhid) + m*wo_old;       //momentum term added
+		wh += eta*outer_prod(hiddelta,cur->input) + m*wh_old;   //momentum term added
+
 		wo_old = eta*outer_prod(outdelta,outhid);                   //save delta w for next iteration (momentum term)
 		wh_old = eta*outer_prod(hiddelta,cur->input);				
 		

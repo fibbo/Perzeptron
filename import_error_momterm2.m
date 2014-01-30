@@ -36,7 +36,7 @@ fclose(fileID);
 % script.
 
 %% Allocate imported array to column variable names
-error = dataArray{:, 1};
+error_m2 = dataArray{:, 1};
 
 %% Clear temporary variables
 clearvars filename delimiter formatSpec fileID dataArray ans;
