@@ -257,7 +257,7 @@ void Example29() {
 
 void Example29b() {
 	int N = 9;
-	Paar p0(N), p1(N), p2(N), p3(N), p4(N), p5(N), p6(N), p7(N); //p0-3 are L's, p4-7 are Squares's
+	Paar p0(N), p1(N), p2(N), p3(N), p4(N), p5(N), p6(N), p7(N); //p0-3 are L's, p4-7 are Squares's, N is the length of the input, output length is always one
 	
 	
 	// intermediate vectors - easier to assign a list of values. they then get copied to boost vectors
@@ -294,21 +294,21 @@ void Example29b() {
 	paarList.push_back(&p6);
 	paarList.push_back(&p7);
 
-	unsigned int innum = 9, hidnum = 3, outnum = 1;
-	matrix<double> wh (hidnum, innum);
-	matrix<double> wo (outnum, hidnum);
+	unsigned int innum = 9, hidnum = 3, outnum = 1; // innum = number of inputs, hidnum = number of hidden neurons, outnum = number of outputs
+	matrix<double> wh (hidnum, innum); matrix<double> wo (outnum, hidnum); //weight matrices for the hidden layer and the output layer
 	initWeights(wh); initWeights(wo);
-	double eta = 0.5;
-	std::ofstream myfile;
-	myfile.open ("example29b.txt");
+	double eta = 0.5; //learning rate
+	std::ofstream errorfile, outputfile;
+	errorfile.open ("example29b_error.txt");
+	outputfile.open ("example29b_output.txt");
 	
 	
 
 	for (unsigned int i = 0; i<5000; i++) {
-		Paar* cur = paarList[Tools::returnRandomI(0,7)];
-		vector<double> xx = prod(wh,cur->input);
-		vector<double> outhid(hidnum);
-		sigmoid(xx,outhid); 
+		Paar* cur = paarList[Tools::returnRandomI(0,7)]; //randomly pick a input/output pair
+		vector<double> xx = prod(wh,cur->input); //determine the output of the hidden layer
+		vector<double> outhid(hidnum); // initialize vector for hidden layer output
+		sigmoid(xx,outhid); // have to program this way because microsoft compiler complains if I pass a boost
 		vector<double> out(outnum);
 		vector<double> yy = prod(wo,outhid);
 		sigmoid(yy,out); // out is usually of length 1 because the final output is just from one neuron
@@ -317,10 +317,11 @@ void Example29b() {
 		vector<double> outdelta(1,e[0]*out[0]*(1-out[0]));
 		vector<double> onevec(hidnum,1);
 		vector<double> hiddelta = inner_prod(outhid,(onevec-outhid))*prod(trans(wo),outdelta);
-
 		wo += eta*outer_prod(outdelta,outhid);
 		wh += eta*outer_prod(hiddelta,cur->input);
-		myfile << "e^2:\t" << inner_prod(e,e) << "\t out:\t" << out << std::endl;
+		double oout = out[0];
+		errorfile  << "e^2:\t"  << inner_prod(e,e) << std::endl;
+		outputfile <<  "out:\t" << oout            << std::endl;
 
 	}
 
@@ -337,14 +338,113 @@ void Example29b() {
 
 	std::cout << out << std::endl;
 	std::cout << cur->output << std::endl;
-	myfile.close();
+	errorfile.close();
+	outputfile.close();
+	
+}
+
+void Example29b_mom_term() {
+	int N = 9;
+	Paar p0(N), p1(N), p2(N), p3(N), p4(N), p5(N), p6(N), p7(N); //p0-3 are L's, p4-7 are Squares's, N is the length of the input, output length is always one
+	
+	
+	// intermediate vectors - easier to assign a list of values. they then get copied to boost vectors
+	std::vector<double> vvL0, vvL1, vvL2, vvL3, vvS0, vvS1, vvS2, vvS3;
+	vvL0 += 0.9, 0.1, 0.1, 0.9, 0.1, 0.1, 0.9, 0.9, 0.1;
+	vvL1 += 0.1, 0.1, 0.1, 0.1, 0.1, 0.9, 0.9, 0.9, 0.9;
+	vvL2 += 0.1, 0.9, 0.9, 0.1, 0.1, 0.9, 0.1, 0.1, 0.9;
+	vvL3 += 0.9, 0.9, 0.9, 0.9, 0.1, 0.1, 0.1, 0.1, 0.1;
+
+	vvS0 += 0.1, 0.1, 0.1, 0.9, 0.9, 0.1, 0.9, 0.9, 0.1;
+	vvS1 += 0.1, 0.1, 0.1, 0.1, 0.9, 0.9, 0.1, 0.9, 0.9;
+	vvS2 += 0.1, 0.9, 0.9, 0.1, 0.9, 0.9, 0.1, 0.1, 0.1;
+	vvS3 += 0.9, 0.9, 0.1, 0.9, 0.9, 0.1, 0.1, 0.1, 0.1;
+
+	copyToBoost(vvL0,p0.input); p0.output = 0.1;
+	copyToBoost(vvL1,p1.input); p1.output = 0.1;
+	copyToBoost(vvL2,p2.input); p2.output = 0.1;
+	copyToBoost(vvL3,p3.input); p3.output = 0.1;
+
+	copyToBoost(vvS0,p4.input); p4.output = 0.9;
+	copyToBoost(vvS1,p5.input); p5.output = 0.9;
+	copyToBoost(vvS2,p6.input); p6.output = 0.9;
+	copyToBoost(vvS3,p7.input); p7.output = 0.9;
+
+
+	std::vector<Paar*> paarList;
+
+	paarList.push_back(&p0);
+	paarList.push_back(&p1);
+	paarList.push_back(&p2);
+	paarList.push_back(&p3);
+	paarList.push_back(&p4);
+	paarList.push_back(&p5);
+	paarList.push_back(&p6);
+	paarList.push_back(&p7);
+
+	unsigned int innum = 9, hidnum = 3, outnum = 1; // innum = number of inputs, hidnum = number of hidden neurons, outnum = number of outputs
+	double m = 0.2; //momentum term
+	matrix<double> wh (hidnum, innum), wo (outnum, hidnum), wh_old(hidnum, innum), wo_old(outnum, hidnum); //weight matrices for the hidden layer and the output layer
+	initWeights(wh); initWeights(wo);
+	double eta = 0.5; //learning rate
+	std::ofstream errorfile, outputfile;
+	errorfile.open ("example29bmomterm_error.txt");
+	outputfile.open ("example29bmomterm_output.txt");
+	
+	
+
+	for (unsigned int i = 0; i<5000; i++) {
+		Paar* cur = paarList[Tools::returnRandomI(0,7)]; //randomly pick a input/output pair
+		vector<double> xx = prod(wh,cur->input); //determine the output of the hidden layer
+		vector<double> outhid(hidnum); // initialize vector for hidden layer output
+		sigmoid(xx,outhid); // have to program this way because microsoft compiler complains if I pass a boost
+		vector<double> out(outnum);
+		vector<double> yy = prod(wo,outhid);
+		sigmoid(yy,out); // out is usually of length 1 because the final output is just from one neuron
+		vector<double> curout(1,cur->output);
+		vector<double> e = vector<double>(curout - out); // e is also of length one
+		vector<double> outdelta(1,e[0]*out[0]*(1-out[0]));
+		vector<double> onevec(hidnum,1);
+		vector<double> hiddelta = inner_prod(outhid,(onevec-outhid))*prod(trans(wo),outdelta);
+		if (i > 0) {
+			wo += eta*outer_prod(outdelta,outhid) + m*wo_old;       //momentum term added
+			wh += eta*outer_prod(hiddelta,cur->input) + m*wh_old;   //momentum term added
+		}
+		else {
+			wo += eta*outer_prod(outdelta,outhid);
+			wh += eta*outer_prod(hiddelta,cur->input);
+		}
+		wo_old = eta*outer_prod(outdelta,outhid);                   //save delta w for next iteration (momentum term)
+		wh_old = eta*outer_prod(hiddelta,cur->input);				
+		
+		double oout = out[0];
+		errorfile  << "e^2:\t"  << inner_prod(e,e) << std::endl;
+		outputfile <<  "out:\t" << oout            << std::endl;
+
+	}
+
+
+	
+	std::cout << "########" << std::endl;
+	Paar* cur = paarList[4];
+	vector<double> xx = prod(wh,cur->input);
+	vector<double> outhid(hidnum);
+	sigmoid(xx,outhid); 
+	vector<double> out(outnum);
+	xx = prod(wo,outhid);
+	sigmoid(xx,out);
+
+	std::cout << out << std::endl;
+	std::cout << cur->output << std::endl;
+	errorfile.close();
+	outputfile.close();
 	
 }
 
 
 int main() {
 	for (unsigned int i = 0; i<1; i++) {
-		Example29b();
+		Example29b_mom_term();
 	}
 
 	Tools::PressEnterToContinue();

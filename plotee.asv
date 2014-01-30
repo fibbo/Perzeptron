@@ -1,0 +1,11 @@
+clear;
+run('import_error.m');
+run('import_output.m');
+for idx = 1:numel(output)
+    if (output(idx) > 0.5)
+        
+output0
+output1
+x = 1:501;
+plot(x,error(:,1)) %plot(x,error([4500:5000],1)) only plots the last 501 data points of the 1st column
+
