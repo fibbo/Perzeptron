@@ -3,6 +3,7 @@
 #include <boost/assign/std/vector.hpp>
 #include "Paar.h"
 #include "Tools.h"
+#include <fstream>
 
 
 
@@ -212,6 +213,10 @@ void Example29() {
 	matrix<double> wo (outnum, hidnum);
 	initWeights(wh); initWeights(wo);
 	double eta = 0.5;
+	std::ofstream myfile;
+	myfile.open ("example29.txt");
+	
+	
 
 	for (unsigned int i = 0; i<5000; i++) {
 		Paar* cur = paarList[Tools::returnRandomI(0,7)];
@@ -219,8 +224,8 @@ void Example29() {
 		vector<double> outhid(hidnum);
 		sigmoid(xx,outhid); 
 		vector<double> out(outnum);
-		xx = prod(wo,outhid);
-		sigmoid(xx,out); // out is usually of length 1 because the final output is just from one neuron
+		vector<double> yy = prod(wo,outhid);
+		sigmoid(yy,out); // out is usually of length 1 because the final output is just from one neuron
 		vector<double> curout(1,cur->output);
 		vector<double> e = vector<double>(curout - out); // e is also of length one
 		vector<double> outdelta(1,e[0]*out[0]*(1-out[0]));
@@ -229,9 +234,97 @@ void Example29() {
 
 		wo += eta*outer_prod(outdelta,outhid);
 		wh += eta*outer_prod(hiddelta,cur->input);
-		/* #####  part below TBD  ##### */
+		myfile << "e^2:\t" << inner_prod(e,e) << "\t out:\t" << out << std::endl;
 
 	}
+
+
+	
+	std::cout << "########" << std::endl;
+	Paar* cur = paarList[3];
+	vector<double> xx = prod(wh,cur->input);
+	vector<double> outhid(hidnum);
+	sigmoid(xx,outhid); 
+	vector<double> out(outnum);
+	xx = prod(wo,outhid);
+	sigmoid(xx,out);
+
+	std::cout << out << std::endl;
+	std::cout << cur->output << std::endl;
+	myfile.close();
+	
+}
+
+void Example29b() {
+	int N = 9;
+	Paar p0(N), p1(N), p2(N), p3(N), p4(N), p5(N), p6(N), p7(N); //p0-3 are L's, p4-7 are Squares's
+	
+	
+	// intermediate vectors - easier to assign a list of values. they then get copied to boost vectors
+	std::vector<double> vvL0, vvL1, vvL2, vvL3, vvS0, vvS1, vvS2, vvS3;
+	vvL0 += 0.9, 0.1, 0.1, 0.9, 0.1, 0.1, 0.9, 0.9, 0.1;
+	vvL1 += 0.1, 0.1, 0.1, 0.1, 0.1, 0.9, 0.9, 0.9, 0.9;
+	vvL2 += 0.1, 0.9, 0.9, 0.1, 0.1, 0.9, 0.1, 0.1, 0.9;
+	vvL3 += 0.9, 0.9, 0.9, 0.9, 0.1, 0.1, 0.1, 0.1, 0.1;
+
+	vvS0 += 0.1, 0.1, 0.1, 0.9, 0.9, 0.1, 0.9, 0.9, 0.1;
+	vvS1 += 0.1, 0.1, 0.1, 0.1, 0.9, 0.9, 0.1, 0.9, 0.9;
+	vvS2 += 0.1, 0.9, 0.9, 0.1, 0.9, 0.9, 0.1, 0.1, 0.1;
+	vvS3 += 0.9, 0.9, 0.1, 0.9, 0.9, 0.1, 0.1, 0.1, 0.1;
+
+	copyToBoost(vvL0,p0.input); p0.output = 0.1;
+	copyToBoost(vvL1,p1.input); p1.output = 0.1;
+	copyToBoost(vvL2,p2.input); p2.output = 0.1;
+	copyToBoost(vvL3,p3.input); p3.output = 0.1;
+
+	copyToBoost(vvS0,p4.input); p4.output = 0.9;
+	copyToBoost(vvS1,p5.input); p5.output = 0.9;
+	copyToBoost(vvS2,p6.input); p6.output = 0.9;
+	copyToBoost(vvS3,p7.input); p7.output = 0.9;
+
+
+	std::vector<Paar*> paarList;
+
+	paarList.push_back(&p0);
+	paarList.push_back(&p1);
+	paarList.push_back(&p2);
+	paarList.push_back(&p3);
+	paarList.push_back(&p4);
+	paarList.push_back(&p5);
+	paarList.push_back(&p6);
+	paarList.push_back(&p7);
+
+	unsigned int innum = 9, hidnum = 3, outnum = 1;
+	matrix<double> wh (hidnum, innum);
+	matrix<double> wo (outnum, hidnum);
+	initWeights(wh); initWeights(wo);
+	double eta = 0.5;
+	std::ofstream myfile;
+	myfile.open ("example29b.txt");
+	
+	
+
+	for (unsigned int i = 0; i<5000; i++) {
+		Paar* cur = paarList[Tools::returnRandomI(0,7)];
+		vector<double> xx = prod(wh,cur->input);
+		vector<double> outhid(hidnum);
+		sigmoid(xx,outhid); 
+		vector<double> out(outnum);
+		vector<double> yy = prod(wo,outhid);
+		sigmoid(yy,out); // out is usually of length 1 because the final output is just from one neuron
+		vector<double> curout(1,cur->output);
+		vector<double> e = vector<double>(curout - out); // e is also of length one
+		vector<double> outdelta(1,e[0]*out[0]*(1-out[0]));
+		vector<double> onevec(hidnum,1);
+		vector<double> hiddelta = inner_prod(outhid,(onevec-outhid))*prod(trans(wo),outdelta);
+
+		wo += eta*outer_prod(outdelta,outhid);
+		wh += eta*outer_prod(hiddelta,cur->input);
+		myfile << "e^2:\t" << inner_prod(e,e) << "\t out:\t" << out << std::endl;
+
+	}
+
+
 	
 	std::cout << "########" << std::endl;
 	Paar* cur = paarList[4];
@@ -243,13 +336,15 @@ void Example29() {
 	sigmoid(xx,out);
 
 	std::cout << out << std::endl;
+	std::cout << cur->output << std::endl;
+	myfile.close();
 	
 }
 
 
 int main() {
 	for (unsigned int i = 0; i<1; i++) {
-		Example29();
+		Example29b();
 	}
 
 	Tools::PressEnterToContinue();
