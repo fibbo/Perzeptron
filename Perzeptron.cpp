@@ -382,11 +382,11 @@ void Example29b_mom_term() {
 	paarList.push_back(&p6);
 	paarList.push_back(&p7);
 
-	unsigned int innum = 9, hidnum = 3, outnum = 1; // innum = number of inputs, hidnum = number of hidden neurons, outnum = number of outputs
-	double m = 0.6; //momentum term
+	unsigned int innum = 9, hidnum = 6, outnum = 1; // innum = number of inputs, hidnum = number of hidden neurons, outnum = number of outputs
+	double m = 0.4; //momentum term
 	matrix<double> wh (hidnum, innum), wo (outnum, hidnum), wh_old(hidnum, innum,0), wo_old(outnum, hidnum,0); //weight matrices for the hidden layer and the output layer
 	initWeights(wh); initWeights(wo);
-	double eta = 0.5; //learning rate
+	double eta = 0.9; //learning rate
 	std::ofstream errorfile, outputfile;
 	errorfile.open ("example29bmomterm6_error.txt");
 	outputfile.open ("example29bmomterm6_output.txt");
