@@ -1,0 +1,270 @@
+\documentclass[10pt]{article}
+
+\renewcommand{\textfraction}{0.001}
+\renewcommand{\topfraction}{0.999}   
+\renewcommand{\bottomfraction}{0.999}
+
+\usepackage{graphicx}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{amscd}
+\usepackage{bibentry}
+\usepackage{a4,color}
+\usepackage{setspace} 
+\usepackage[numbers,square,sort&compress]{natbib}
+\usepackage{fancyhdr}
+\usepackage{sectsty}
+\usepackage{xspace}
+\usepackage{multicol}
+\usepackage{bm}
+\usepackage{footmisc}
+\usepackage{caption}
+\usepackage{float}
+\usepackage{epstopdf}
+\usepackage{epsfig}
+
+\usepackage{mathpazo}
+\linespread{1.05}         % Palatino needs more leading (space between lines)
+\usepackage[T1]{fontenc}
+%\usepackage[version=3]{mhchem}
+\usepackage[english]{babel}
+
+\setlength{\multicolsep}{17pt}
+\setlength{\columnsep}{14pt}
+\setlength{\abovecaptionskip}{0pt}
+\setlength{\belowcaptionskip}{5pt}
+
+\setlength{\bibsep}{2pt}
+\setlength{\tabcolsep}{4pt}
+\setlength{\voffset}{-5mm}      
+\setlength{\parindent}{5mm} 
+\setlength{\parskip}{0.1ex}
+
+\setlength{\topmargin}{-14mm}
+\setlength{\oddsidemargin}{-6mm}
+\setlength{\evensidemargin}{-6mm}
+\setlength{\textwidth}{17.8cm}
+\setlength{\textheight}{24.cm}
+\setlength{\headheight}{12.0pt}
+
+\setlength{\headsep}{10mm}
+
+\addtolength{\headwidth}{0.cm}
+
+
+%\setlength{\topmargin}{0mm}
+\setlength{\oddsidemargin}{-8.5mm}
+\setlength{\evensidemargin}{-8.5mm}
+\setlength{\textwidth}{18.2cm}
+%\setlength{\textheight}{28.7cm}
+
+
+
+
+
+\definecolor{red}{rgb}{1,0,0}
+\definecolor{green}{rgb}{0,1,0}
+\definecolor{blue}{rgb}{0,0,1}
+\definecolor{darkblue}{rgb}{0,0,0.8}
+
+\definecolor{yellow}{rgb}{1,1,0}
+\definecolor{lightblue}{rgb}{0,1,1}
+\definecolor{magenta}{rgb}{1,0,1}
+\definecolor{lightgrey}{rgb}{0.5,0.5,0.5}
+\definecolor{grey}{rgb}{0.35,0.35,0.35}
+\definecolor{darkgrey}{rgb}{0.2,0.2,0.2}
+\definecolor{ockerrot}{rgb}{0.859,0.375,0.152}
+
+
+
+
+
+\def\pplb{\fontsize{24}{28pt}\usefont{T1}{ppl}{m}{n}\selectfont}
+\def\pplm{\fontsize{18}{21pt}\usefont{T1}{ppl}{m}{n}\selectfont}
+\def\ppls{\fontsize{13}{15pt}\usefont{T1}{ppl}{m}{n}\selectfont}
+\def\ppln{\fontsize{12}{14pt}\usefont{T1}{ppl}{m}{n}\selectfont}
+\def\pplv{\fontsize{10}{12pt}\usefont{T1}{ppl}{m}{n}\selectfont}
+\def\pplbb{\fontsize{24}{28pt}\usefont{T1}{ppl}{d}{n}\selectfont}
+\def\pplmb{\fontsize{18}{21pt}\usefont{T1}{ppl}{d}{n}\selectfont}
+\def\pplnb{\fontsize{15}{18pt}\usefont{T1}{ppl}{d}{n}\selectfont}
+\def\pplsb{\fontsize{13}{15pt}\usefont{T1}{ppl}{d}{n}\selectfont}
+\def\plvb{\color{darkgrey}\fontsize{10}{12pt}\usefont{T1}{ppl}{b}{n}\selectfont}
+\def\pplvb{\color{darkgrey}\fontsize{10}{12pt}\usefont{T1}{ppl}{d}{n}\selectfont}
+\def\bibppl{\fontsize{10}{12pt}\usefont{T1}{ppl}{m}{n}\selectfont}
+\def\head{\fontsize{10}{12pt}\usefont{T1}{cmss}{bx}{n}\selectfont}
+\def\footfnt{\fontsize{7}{9pt}\usefont{T1}{cmss}{m}{n}\selectfont}
+
+\def\listfnt{\fontsize{10}{12pt}\usefont{T1}{cmss}{m}{n}\selectfont}
+
+
+
+
+%\include{definitions}
+
+\AtBeginDocument{\renewcommand{\refname}{ \vspace*{-40pt} }}
+
+
+\fancypagestyle{plain}{\fancyhf{}}
+
+
+\pagestyle{fancy}
+
+
+%\fancyfoot[RO]{\textsf{\nouppercase{\leftmark}}}
+\cfoot{~}
+
+\fancypagestyle{plain}{\fancyhf{}}
+
+%\def\plvb{\color{darkgrey}\fontsize{10}{12pt}\usefont{T1}{ppl}{b}{n}\selectfont}
+
+\def\secfnt{\fontsize{20}{20pt}\usefont{T1}{ppl}{d}{n}\selectfont}
+
+
+
+\def\authorfnt{\fontsize{13}{20pt}\usefont{T1}{ppl}{d}{n}\selectfont}
+\def\subsecfnt{\fontsize{10}{12pt}\usefont{T1}{cmss}{bx}{n}\selectfont}
+\def\subsubsecfnt{\fontsize{10}{12pt}\usefont{T1}{cmss}{bx}{n}\selectfont}
+
+\sectionfont{\secfnt\bfseries}
+\renewcommand*{\bibfont}{\sffamily}
+
+\subsectionfont{\subsecfnt}
+\subsubsectionfont{\subsecfnt\color{grey}}
+\paragraphfont{\ppls}
+
+\subparagraphfont{\normalsize}
+\captionsetup{margin=0pt,font=small,labelfont=sc,labelformat=simple,format=plain,indention=3mm,
+ labelsep=endash,textfont=sf,font=sf,singlelinecheck=false,figurename=Fig.,tablename=Tab.}
+
+
+
+
+%\begin{minipage}{\textwidth}\ce
+
+
+\setcounter{secnumdepth}{3}
+\setcounter{tocdepth}{2}
+
+\renewcommand{\headrulewidth}{1pt}  
+\renewcommand{\footrulewidth}{1pt}
+\renewcommand{\thepart}{\Alph{part}}
+\renewcommand{\footnoterule}{}
+\renewcommand{\labelitemi}{-}
+\renewcommand{\thefigure}{\thesection.\arabic{figure}}
+\renewcommand{\thetable}{\thesection.\arabic{table}}
+\renewcommand{\theequation}{\thesection.\arabic{equation}}
+\renewcommand{\sectionmark}[1]{\markboth{\MakeUppercase{#1}}{}}
+\renewcommand*{\footnotelayout}{\small\sffamily}
+
+\newdimen\ArrayruleHwidth
+\setlength{\ArrayruleHwidth}{1.5pt}
+\makeatletter
+\def\Hline{\noalign{\ifnum0=`}\color{darkgrey}\fi\hrule \@height \ArrayruleHwidth
+\futurelet \@tempa\@xhline}
+\makeatother
+
+\newcommand{\Tabul}[2]
+{\begin{tabular*}
+{\linewidth}{@{\extracolsep{\fill}}#1}
+#2\end{tabular*}}
+
+
+\newcommand{\zusammen}[5]{{\bf #1}\hspace*{\fill}\parbox[t]{0.9\linewidth}{{\bf #2}\newline
+{\it Gruppe #3}\\[2mm]#4}\hspace*{5mm}#5 \vspace*{5mm}}
+\newcommand\List[1]{
+\begin{list}{-}
+{\setlength{\leftmargin}{15pt} \setlength{\topsep}{2mm}}
+#1 \end{list}\vspace*{2mm}}
+
+\newcommand\Listitem[2]{\item{\listfnt #1}\\{#2}}
+\newcommand\Listeitem[3]{\item{\listfnt #1}\hspace*{\fill}{#2}\\[2mm]{#3}}
+
+\newcommand\Lst[1]{
+\begin{list}{}
+{\setlength{\leftmargin}{0pt} \setlength{\topsep}{0mm}}
+#1 \end{list}\vspace*{1mm}}
+
+\newcommand\Talkitem[3]{\item{#1: }{\listfnt #2}\\{#3}}
+
+\newcommand\resetcounters{\setcounter{figure}{0} \setcounter{table}{0} }
+
+\newcommand{\authorsfull}[3]{
+\hspace*{\fill}\parbox{0.94\linewidth}{\linespread{0.92}\authorfnt #1\\}
+\hspace*{\fill}\parbox{0.94\linewidth}{\normalsize #2\\}
+\hspace*{\fill}\parbox{0.935\linewidth}{\head #3 }
+}
+
+\newcommand{\authorsmid}[2]{
+\hspace*{\fill}\parbox{0.94\linewidth}{\linespread{0.92}\authorfnt #1\\}
+\hspace*{\fill}\parbox{0.94\linewidth}{\normalsize #2\\}
+}
+
+\newcommand{\authorsshort}[1]{
+\hspace*{\fill}\parbox{0.94\linewidth}{\linespread{0.92}\authorfnt #1\\}
+}
+
+
+\makeatletter
+\newenvironment{tablehere}
+  {\def\@captype{table}}
+  {}
+
+\newenvironment{figurehere}
+  {\def\@captype{figure}}
+  {}
+\makeatother
+
+\newcommand{\Tbu}[3]
+{
+\begin{table}[H]
+{\caption ~ { #1 \\}}
+\begin{tabular*}{\linewidth}{@{\extracolsep{\fill}}#2}
+\Hline
+#3
+\Hline
+\end{tabular*}
+\end{table}
+}
+
+\newcommand{\Tabu}[3]{\begin{table}[bht]\begin{minipage}{\textwidth}
+{\pplvb\caption{~\hspace*{\textwidth}\vspace*{-9pt}}\hspace*{\fill}\parbox{0.87\linewidth}{ #1 \\[-4pt]}}
+\begin{tabular*}{\textwidth}{@{\extracolsep{\fill}}#2}
+\Hline#3\Hline\end{tabular*}\end{minipage}\end{table}}
+
+
+\def\~{\hspace*{2pt}}
+\fontfamily{ppl}\selectfont
+
+\def\@reffont{\fontsize{19}{20.8}\selectfont}
+
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{3ex}
+\begin{document}
+\title{Neural Network - Steepest Gradient Method - Conjugate Gradient Method}
+\author{Philipp Gloor}
+%\date{24.06.2013}
+\maketitle
+\begin{abstract}
+
+\end{abstract}
+\newpage
+\pagestyle{fancy}
+\renewcommand{\sectionmark}[1]{\markright{#1}{}}
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{exp29b_hidden_neurons}
+\caption{Changing the number of hidden neurons}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{exp29b_momentum_term}
+\caption{Changing the momentum term}
+\end{figure}
+
+\begin{figure}
+\centering
+\includegraphics[width=0.5\textwidth]{exp29b_learning_rate}
+\caption{Changing the learning rate}
+\end{figure}
+\end{document}
