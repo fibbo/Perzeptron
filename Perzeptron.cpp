@@ -483,14 +483,14 @@ void Example29b_mom_term_2hidden_layers() {
 	paarList.push_back(&p6);
 	paarList.push_back(&p7);
 
-	unsigned int innum = 9, hidnum = 3, hidhidnum = 3, outnum = 1; // innum = number of inputs, hidnum = number of hidden neurons, outnum = number of outputs
-	double m = 0; //momentum term
+	unsigned int innum = 9, hidnum = 6, hidhidnum = 6, outnum = 1; // innum = number of inputs, hidnum = number of hidden neurons, outnum = number of outputs
+	double m = 0.; //momentum term
 	matrix<double> wh (hidnum, hidhidnum), whh (hidhidnum, innum), wo (outnum, hidnum), wh_old(hidnum, hidhidnum,0), whh_old(hidhidnum, innum,0), wo_old(outnum, hidnum,0); //weight matrices for the hidden layer and the output layer
 	initWeights(wh); initWeights(wo); initWeights(whh);
-	double eta = 0.5, a = 1.; //learning rate
+	double eta = 0.2, a = 1; //learning rate
 	std::ofstream errorfile, outputfile;
-	errorfile.open ("example29bhidlayer_error.txt");
-	outputfile.open ("example29bhidlayer_output.txt");
+	errorfile.open  ("set1_error.txt");
+	outputfile.open ("set1_output.txt");
 	
 	
 
@@ -498,13 +498,13 @@ void Example29b_mom_term_2hidden_layers() {
 		Paar* cur = paarList[Tools::returnRandomI(0,7)]; //randomly pick a input/output pair
 		vector<double> zz = prod(whh,cur->input);
 		vector<double> outhidhid(hidhidnum);
-		sigmoida(zz,outhidhid,a);
+		sigmoid(zz,outhidhid);
 		vector<double> xx = prod(wh,outhidhid); //determine the output of the hidden layer
 		vector<double> outhid(hidnum); // initialize vector for hidden layer output
-		sigmoida(xx,outhid,a); // have to program this way because microsoft compiler complains if I pass a boost
+		sigmoid(xx,outhid); // have to program this way because microsoft compiler complains if I pass a boost
 		vector<double> yy = prod(wo,outhid);
 		vector<double> out(outnum);
-		sigmoida(yy,out,a); // out is usually of length 1 because the final output is just from one neuron
+		sigmoid(yy,out); // out is usually of length 1 because the final output is just from one neuron
 		vector<double> curout(1,cur->output);
 		vector<double> e = vector<double>(curout - out); // e is also of length one
 		vector<double> outdelta(1,e[0]*out[0]*(1-out[0]));
@@ -533,7 +533,7 @@ void Example29b_mom_term_2hidden_layers() {
 	Paar* cur = paarList[4];
 	vector<double> zz = prod(whh,cur->input);
 	vector<double> outhidhid(hidhidnum);
-	sigmoida(zz,outhidhid,a);
+	sigmoid(zz,outhidhid);
 	vector<double> xx = prod(wh,outhidhid); //determine the output of the hidden layer
 	vector<double> outhid(hidnum); // initialize vector for hidden layer output
 	sigmoid(xx,outhid); // have to program this way because microsoft compiler complains if I pass a boost
@@ -550,7 +550,7 @@ void Example29b_mom_term_2hidden_layers() {
 
 int main() {
 	for (unsigned int i = 0; i<1; i++) {
-		Example29b_mom_term();
+		Example29b_mom_term_2hidden_layers();
 	}
 
 	Tools::PressEnterToContinue();
