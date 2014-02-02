@@ -1,4 +1,6 @@
 \documentclass[10pt]{article}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
 
 \renewcommand{\textfraction}{0.001}
 \renewcommand{\topfraction}{0.999}   
@@ -12,6 +14,8 @@
 \usepackage{a4,color}
 \usepackage{setspace} 
 \usepackage[numbers,square,sort&compress]{natbib}
+\usepackage{caption} %für subfloats
+\usepackage{subcaption} %für subfloats
 \usepackage{fancyhdr}
 \usepackage{sectsty}
 \usepackage{xspace}
@@ -22,16 +26,18 @@
 \usepackage{float}
 \usepackage{epstopdf}
 \usepackage{epsfig}
-
+\usepackage[ngerman]{babel}
+\usepackage{listings}
+\usepackage{textcomp}
 \usepackage{mathpazo}
 \linespread{1.05}         % Palatino needs more leading (space between lines)
 \usepackage[T1]{fontenc}
+\usepackage{url}
 %\usepackage[version=3]{mhchem}
-\usepackage[english]{babel}
 
 \setlength{\multicolsep}{17pt}
 \setlength{\columnsep}{14pt}
-\setlength{\abovecaptionskip}{0pt}
+\setlength{\abovecaptionskip}{5pt}
 \setlength{\belowcaptionskip}{5pt}
 
 \setlength{\bibsep}{2pt}
@@ -74,6 +80,52 @@
 \definecolor{grey}{rgb}{0.35,0.35,0.35}
 \definecolor{darkgrey}{rgb}{0.2,0.2,0.2}
 \definecolor{ockerrot}{rgb}{0.859,0.375,0.152}
+
+\definecolor{listinggray}{gray}{0.9}
+\definecolor{lbcolor}{rgb}{0.9,0.9,0.9}
+\lstset{
+backgroundcolor=\color{lbcolor},
+    tabsize=4,    
+%   rulecolor=,
+    language=[GNU]C++,
+        basicstyle=\scriptsize,
+        upquote=true,
+        aboveskip={1.5\baselineskip},
+        columns=fixed,
+        showstringspaces=false,
+        extendedchars=false,
+        breaklines=true,
+        prebreak = \raisebox{0ex}[0ex][0ex]{\ensuremath{\hookleftarrow}},
+        frame=single,
+        numbers=left,
+        showtabs=false,
+        showspaces=false,
+        showstringspaces=false,
+        identifierstyle=\ttfamily,
+        keywordstyle=\color[rgb]{0,0,1},
+        commentstyle=\color[rgb]{0.026,0.112,0.095},
+        stringstyle=\color[rgb]{0.627,0.126,0.941},
+        numberstyle=\color[rgb]{0.205, 0.142, 0.73},
+%        \lstdefinestyle{C++}{language=C++,style=numbers}’.
+}
+\lstset{
+    backgroundcolor=\color{lbcolor},
+    tabsize=4,
+  language=C++,
+  captionpos=b,
+  tabsize=3,
+  frame=lines,
+  numbers=left,
+  numberstyle=\tiny,
+  numbersep=5pt,
+  breaklines=true,
+  showstringspaces=false,
+  basicstyle=\footnotesize,
+%  identifierstyle=\color{magenta},
+  keywordstyle=\color[rgb]{0,0,1},
+  commentstyle=\color{ockerrot},
+  stringstyle=\color{red}
+  }
 
 
 
@@ -133,8 +185,7 @@
 \paragraphfont{\ppls}
 
 \subparagraphfont{\normalsize}
-\captionsetup{margin=0pt,font=small,labelfont=sc,labelformat=simple,format=plain,indention=3mm,
- labelsep=endash,textfont=sf,font=sf,singlelinecheck=false,figurename=Fig.,tablename=Tab.}
+\captionsetup{font=small,labelfont=sc,textfont=sf,font=sf,figurename=Fig.,tablename=Tab.}
 
 
 
@@ -239,32 +290,525 @@
 
 \setlength{\parindent}{0pt}
 \setlength{\parskip}{3ex}
+
+
+\bibliographystyle{ieeetr}
 \begin{document}
 \title{Neural Network - Steepest Gradient Method - Conjugate Gradient Method}
 \author{Philipp Gloor}
 %\date{24.06.2013}
 \maketitle
-\begin{abstract}
 
-\end{abstract}
 \newpage
 \pagestyle{fancy}
 \renewcommand{\sectionmark}[1]{\markright{#1}{}}
-\begin{figure}
+\tableofcontents
+\section{Einführung}
+\subsection{Mathematische Neuronen}
+
+Die Anfänge der künstlichen Neuronen gehen auf Wareen McCulloch und Walter Pitts im Jahr 1943 zurück. Sie zeigten an einem vereinfachten Modell eines neuronalen Netzwerkes, dass diese logische und arithmetische Funktionen berechnen kann. Dieses Neuronenmodell ist heute als McCulloch-Pitts Neuron bekannt \cite{mccullochpitt}.
+
+\begin{figure}[h!]
 \centering
-\includegraphics[width=0.5\textwidth]{exp29b_hidden_neurons}
-\caption{Changing the number of hidden neurons}
+\includegraphics[width=0.5\textwidth]{mccp}
+\caption{Das McCulloch-Pitt Neuronenmodell}
 \end{figure}
 
-\begin{figure}
+\subsubsection{McCulloch-Pitt Neuron}
+
+Ein McCulloch-Pitt Neuron besteht aus mehreren Eingängen (stellvertretend für die Dendriten) und in der Regel einem einzigen Ausgang (das Axon). Die Werte aus jedem Eingang werden in der Regel summiert und falls die Summe dann h"oher als eine Schwelle $\Theta$ ist, als Ausgang ausgegeben. Der Ausgangswert war dann entweder 1 (\textit{true}) oder 0 (\textit{false}).
+
+1949 beschrieb Donald Hebb die Hebbsche Lernregel
+
+\begin{equation}
+\Delta w_{ij} = \eta\cdot a_i\cdot o_i
+\end{equation}
+\begin{itemize}
+\item \( \Delta w_{ij} \) Veränderung des Gewichtes von Neuron j zu Neuron i
+\item \( \eta \) \textit{Lernrate}
+\item \( a_i  \) Aktivierung von Neuron i
+\item \( o_i  \) Ausgabe von Neuron j, das mit Neuron i verbunden ist
+\end{itemize}
+
+Das bedeutet: Je h"aufiger ein Neuron A gleichzeitig mit Neuron B aktiv ist, umso bevorzugter werden die beiden Neuronen aufeinander reagieren ("what fires together, wires together").
+
+\section{Theorie}
+\subsection{Perzeptron-Modell}
+
+1958 von Frank Rosenblatt entwickelt bildet das Perzeptron-Modell bis heute die Grundlage k"unstlicher neuronalen Netze. Das klassiche Neuron ist das sogennante Perzeptron. Es summiert "uber alle Eing"ange, wobei es die Eing"ange mit Gewichten, welche geeignet gelernt werden k"onnen, versieht. Es hat ausserdem eine Feuerschwelle (auch Bias genannt) und eine Ausgabefunktion. Auf die Feuerschwelle kann in vielen F"allen verzichtet werden.
+Das Lernen findet mit Hilfe eines Gradientenabstiegs statt.
+
+Das Perzeptron-Modell ist aber limitiert. Es kann z.B. nicht das XOR Problem l"osen (ein zweischichtiges Netzwerk kann das \cite{rojas}).
+
+\begin{figure}[h!]
 \centering
-\includegraphics[width=0.5\textwidth]{exp29b_momentum_term}
-\caption{Changing the momentum term}
+\includegraphics[width=0.5\textwidth]{mccullochpitt}
+\caption{Das Perzeptron\cite{perzeptron}}
+\end{figure}	
+
+\subsection{Hebbsche Lernregel mit dem Perzeptron}
+
+Im zeitdiskreten Fall sieht die Lernregel folgendermassen aus:
+
+\begin{align}
+y = w.in\\
+e = t - y\\
+w += \eta\cdot e.in
+\end{align}
+
+$a.b$ steht f"ur das Skalarprodukt zweier Vektoren oder Matrix-Vektormultiplikation.
+\subsection{Ausgabefunktion}
+
+Die Ausgabefunktion beschreibt, wie ein Zellk"orper im Allgemeinen nichtlinear auf die Aufladung reagiert. F"ur die Ausgabefunktion wird oft die Sigmoidfunktion gew"ahlt
+
+\[ f(x) = \frac{1}{1+e^{-ax}}\]
+
+F"ur grosse $a$ konvergiert sie zur klassischen Heavysidefunktion. F"ur kleine $a$ wird der "Ubergang flacher. Die Sigmoidfunktion ist monoton steigend, beschr"ankt und die Ableitung l"asst sich durch kombinieren der Sigmoidfunktion selber schreiben:
+
+\[ f'(x) = a\cdot f(x)(1-f(x)) \]
+\subsection{Momentum Term}
+
+Bei \textit{Momentum Term} handelt es sich um eine Erweiterung der Hebbschen Lernregel. Es geht darum, dass man beim "andern der Gewichte noch ein Schritt aus der Vergangenheit mitnimmt und dadurch meist schneller zum Minimum konvergiert.
+
+\begin{figure}[h]
+        \centering
+        \begin{subfigure}[b]{0.5\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{valley1.jpg}
+                \label{fig:valley1}
+        \end{subfigure}%
+        ~ %add desired spacing between images, e. g. ~, \quad, \qquad etc.
+          %(or a blank line to force the subfigure onto a new line)
+        \begin{subfigure}[b]{0.5\textwidth}
+                \centering
+                \includegraphics[width=\textwidth]{valley2.jpg}
+                \caption{A tiger}
+                \label{fig:valley2}
+        \end{subfigure}
+\caption{Ohne momentum term (links) und mit momentum term (rechts)\cite{momterm}}
 \end{figure}
 
-\begin{figure}
+\[ \Delta w_{ij}(t) = \eta\cdot e.in + m\Delta w_{ij}(t-1) \]
+
+wobei $m$ ein neuer globaler Parameter ist, der durch \textit{Trial and Error} bestimmt werden muss. Der \textit{Momentum Term} addiert einen Bruchteil des vorherigen Gewichte-Update zum aktuellen. Wenn der Gradient in die gleiche Richtung zeigt, vergr"ossert das so die Schrittgr"osse und man konvergiert schneller zum minimum.
+
+\subsection{Neuronale Netzwerke}
+
+Ein neuronales Netzwerk besteht aus einem Netzwerk von k"unstlichen Neuronen. Insgesamt handelt es sich um eine Abstraktion von Informationsverarbeitung aber es hat seinen Ursprung in der Biologie und dem Gehirn. Heutzutage werden aber neuronale Netzwerke weniger f"ur das Nachbilden biologischer neuronaler Netze, was eher Gegenstand der \textit{Computational Neuroscience} ist.
+
+\begin{figure}[h!]
 \centering
-\includegraphics[width=0.5\textwidth]{exp29b_learning_rate}
-\caption{Changing the learning rate}
+\includegraphics[width=0.5\textwidth]{nn}
+\caption{Schematisches neuronales Netzwerk mit 2 Eing"angen, einer versteckten Schicht und einem Ausgang\cite{wikipedia}}
 \end{figure}
+
+
+\section{Anwendungen}
+
+K"unstliche neuronale Netzwerke sind besonders f"ur Anwendungen geeignet wo wenig oder kein explizites (systematisches Wissen) "uber das zu l"osende Problem notwendig ist. Dazu geh"oren zum Beispiel
+
+\begin{itemize}
+\item Texterkennung
+\item Bilderkennung
+\item Gesichtserkennung
+\end{itemize}
+
+bei denen einige Hunderttausend bis Millionen Bildpunkte in eine im Vergleich geringe Anzahl von erlaubten Ereignissen "uberf"uhrt werden m"ussen.
+
+\section{Ver"anderung der Parameter}
+
+Bei den durchgef"uhrten Simulationen wurden folgende Parameter ver"andert und dann verglichen.
+
+\begin{itemize}
+\item $\eta$ - Die \textit{Lernrate}
+\item $m$    - Der '\textit{Momentum Term}'
+\item $hidnum$ - Anzahl versteckter Neuronen im ersten \textit{Hidden Layer}
+\item $hidhidnum$ - Anzahl versteckter Neuronen im zweiten \textit{Hidden Layer} (falls vorhanden)
+\end{itemize}
+
+\section{Messungen und Resultate}
+
+In diesem Abschnitt werden die gefundenen Resultate diskutiert. Folgende Formen sollte das Neuronale Netzwerk erkennen:
+
+
+\subsection{Symbolerkennung mit einem Hidden Layer - zwei m"ogliche Outputs}
+
+\subsubsection{Lernrate}
+Die \textit{Lernrate} bestimmt wie stark die Gewichte angepasst werden. Grunds"atzlich je gr"osser die \textit{Lernrate}, desto schneller sollte man das Minimum finden. Es kann aber auch kontraproduktiv wirken insofern, dass man nicht beliebig nah ans Minimum kommt, weil man durch die grosse \textit{Lernrate} immer dar"uber hinaus schiesst.
+
+\begin{figure}[hp!]
+\centering
+\includegraphics[width=0.8\textwidth]{../data/1hlayer_learningrate/1l_eta.png}
+\caption{Lernphase des Netzwerks mit verschiedenen $\eta$'s}
+\end{figure}
+
+Hier sieht man gut, dass eine Vergr"osserung der \textit{Lernrate} von $0.2$ auf $0.4$ zu einem schnelleren Lernen f"uhrt. Jedoch der Sprung von $0.4$ auf $0.6$ weniger effizient ist, als der Sprung vorher. Aber $0.6$ scheint in diesem Fall ein guter Wert zu sein, aber auch mit $0.4$ funktioniert es gut.
+
+Die anderen Parameter sind fixiert.
+
+\begin{itemize}
+\item $hidnum = 6$
+\item $m = 0.2$
+\end{itemize}
+
+\subsubsection{Momentum Term}
+
+
+\begin{figure}[hp!]
+\centering
+\includegraphics[width=0.8\textwidth]{../data/1hlayer_momentumterm/1l_m.png}
+\caption{Lernphase des Netzwerks mit verschiedenen $m$'s}
+\end{figure}
+
+Der \textit{Momentum Term} bestimmt wie viel wir vom vorherigen Schritt in den n"achsten mitnehmen. In folgenden Beispiel hat der \textit{Momentum Term} keinen grossen Einfluss. Das System lernt mit oder ohne \textit{Momentum Term} fast gleich schnell und man k"onnte deshalb in diesem Beispiel auf den \textit{Momentum Term} verzichten.
+
+Die anderen Parameter sind fixiert.
+
+\begin{itemize}
+\item $hidnum = 6$
+\item $\eta = 0.2$
+\end{itemize}
+
+\subsubsection{Versteckte Neuronen}
+
+Versteckte Neuronen sind solche Neuronen, deren Output man von aussen nicht sieht und ihren Output nur an die n"achste Schicht weitergeben (in diesem Beispiel an das Output-Neuron).
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.8\textwidth]{../data/1hlayer_hiddenneurons/1l_hidnum.png}
+\caption{Lernphase des Netzwerks mit verschiedenen $hidnum$'s}
+\end{figure}
+Man sieht, dass die Anzahl versteckter Neuronen einen grossen Einfluss auf die Lerngeschwindigkeit des Systems hat, aber auch hier wieder ist der Sprung bei der zweiten Erh"ohung (von 4 bis 6) nicht so gross wie beim ersten (von 2 bis 4).
+
+Die anderen Parameter sind fixiert.
+
+\begin{itemize}
+\item $m = 0.2$
+\item $\eta = 0.2$
+\end{itemize}
+\clearpage
+\subsection{Symbolerkennung mit zwei Hidden Layer - zwei m"ogliche Outputs}
+
+\subsubsection{Lernrate}
+
+Beim zweischichtigen neuronalen Netzwerk sieht man, wenn man eine zu hohe \textit{Lernrate} w"ahlt, dass der Effekt negativ sein kann. Bei $\eta = 0.6$ schafft es das Netzwerk nicht, f"ur den zweiten Wert den richtigen Output zu lernen und der Fehler wie man sieht, springt immer hin und her und wird nicht kleiner.
+
+\begin{figure}[!h]
+\centering
+\includegraphics[width=0.8\textwidth]{../data/2hlayer_eta/2l_eta.png}
+\caption{Lernphase des Netzwerks mit verschiedenen $\eta$'s}
+\end{figure}
+
+\subsubsection{Momentum Term}
+
+Der \textit{Momentum Term} steigert in einem ersten Schritt die Lerngeschwindigkeit erheblich (richtige Outputs schon nach \textasciitilde $1700$ Schritten anstatt nach \textasciitilde $2200$ Schritten. Der n"achste Sprung hat wiederum eine kleinere Wirkung, aber die Zielwerte werden mit guter Sicherheit gelernt.
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{../data/2hlayer_momentumterm/2l_m.png}
+\caption{Lernphase des Netzwerks mit verschiedenen $m$'s}
+\end{figure}
+
+\subsubsection{Versteckte Neuronen (1. Schicht)}
+
+Die 1. versteckte Neuronenschicht scheint extrem wichtig zu sein. Bei nur 2 versteckten Neuronen in der 1. Schicht, schafft es das Netzwerk "uberhaupt nicht, die Zielwerte zu lernen sondern pendelt die ganze Lernperiode in der Mitte hin und her.
+Bei 4 versteckten Neuronen scheint das Netzwerk nach "uber 4000 Schritten in die richtige Richtung zu gehen, ob es aber wirklich die Zielwerte lernen kann m"usste "uberpr"uft werden.
+Einzig bei 6 versteckten Neuronen in der 1. Schicht, scheint das Netzwerk in der Lage zu sein, die Zielwerte richtig zu lernen und das auch relativ schnell ($< 2000$ Schritte).
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{../data/2hlayer_hidnum/2l_hidnum.png}
+\caption{Lernphase des Netzwerks mit verschiedenen $hidnum$'s}
+\end{figure}
+
+\subsubsection{Versteckte Neuronen (2. Schicht)}
+
+Die zweite versteckte Schicht scheint nicht so anf"allig wie die erste zu sein. Hier finden wir bei allen Werten innerhalb der Lernperiode, dass das Netzwerk die richtigen Zielwerte gelernt hat. Klar ist aber, dass es nur mit 2 versteckten Neuronen in der 2. Schicht mit Abstand am l"angsten dauert ("uber $4000$ Schritte gegen"uber $<2500$ mit 4 und mehr versteckten Neuronen).
+
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{../data/2hlayer_hidhidnum/2l_hidhidnum.png}
+\caption{Lernphase des Netzwerks mit verschiedenen $hidhidnum$'s}
+\end{figure}
+\subsection{Symbolerkennung mit drei m"oglichen Outputs}
+Als letztes habe ich noch versucht, das Netzwerk 3 anstatt von 2 Mustern erkennen zu lassen (ich habe auch noch 4 versucht, aber dazu fand ich kein passendes Set von Parametern, so dass das Netzwerk die Zielwerte richtig lernen konnte.
+
+Zus"atzlich zu den ersten beiden Mustern kommt hier noch ein drittes hinzu. Die ersten beiden Muster hatten Zielwerte 0.1 und 0.6. Das dritte Muster hat den Wert 0.6
+
+Die Parameter f"ur dieses Problem waren folgende:
+\begin{itemize}
+\item $\eta = 0.3$
+\item $m = 0.3$
+\item $hidnum = 24$
+\item $hidhidnum = 12$
+\end{itemize}
+\begin{figure}[h!]
+\centering
+\includegraphics[width=0.8\textwidth]{../data/3_outputs/2l_3output.png}
+\caption{Lernphase des Netzwerks mit verschiedenen $hidhidnum$'s}
+\end{figure}
+
+\subsection{Schlussfolgerungen}
+
+Wir haben hier nur jeweils die Leistung des Netzwerkes unter Ver"anderung jeweils eines Parameters angeschaut. Es ist aber durchaus denkbar, dass auf den ersten Blick schlechte Parameterwahl sich verbessern k"onnte, wenn man einen zweiten Parameter weiter anpasst.
+
+\clearpage
+\section{Code}
+
+\subsection{Eine versteckte Schicht}
+\begin{lstlisting}
+	unsigned int innum = 9, hidnum = 6, outnum = 1; // innum = number of inputs, hidnum = number of hidden neurons, outnum = number of outputs
+	double m = 0.6; //momentum term
+	matrix<double> wh (hidnum, innum), wo (outnum, hidnum), wh_old(hidnum, innum,0), wo_old(outnum, hidnum,0); //weight matrices for the hidden layer and the output layer
+	initWeights(wh); initWeights(wo);
+	double eta = 0.4; //learning rate
+	std::ofstream errorfile, outputfile;
+	errorfile.open ("set3_error.txt");
+	outputfile.open ("set3_output.txt");
+	
+	
+
+	for (unsigned int i = 0; i<5000; i++) {
+		Paar* cur = paarList[Tools::returnRandomI(0,7)]; //randomly pick a input/output pair
+		vector<double> xx = prod(wh,cur->input); //determine the output of the hidden layer
+		vector<double> outhid(hidnum); // initialize vector for hidden layer output
+		sigmoid(xx,outhid); // have to program this way because microsoft compiler complains if I pass a boost
+		vector<double> out(outnum);
+		vector<double> yy = prod(wo,outhid);
+		sigmoid(yy,out); // out is usually of length 1 because the final output is just from one neuron
+		vector<double> curout(1,cur->output);
+		vector<double> e = vector<double>(curout - out); // e is also of length one
+		vector<double> outdelta(1,e[0]*out[0]*(1-out[0]));
+		vector<double> onevec(hidnum,1);
+		vector<double> hiddelta = inner_prod(outhid,(onevec-outhid))*prod(trans(wo),outdelta);
+
+		wo += eta*outer_prod(outdelta,outhid) + m*wo_old;       //momentum term added
+		wh += eta*outer_prod(hiddelta,cur->input) + m*wh_old;   //momentum term added
+
+		wo_old = eta*outer_prod(outdelta,outhid);   //save delta w for next iteration (momentum term)
+		wh_old = eta*outer_prod(hiddelta,cur->input);				
+		
+		double oout = out[0];
+		errorfile  << "e^2:\t"  << inner_prod(e,e) << std::endl;
+		outputfile <<  "out:\t" << oout     << "\t" << cur->output  << std::endl;
+
+	}
+\end{lstlisting}
+
+\subsection{Zwei versteckte Schichten}
+\begin{lstlisting}
+unsigned int innum = 9, hidnum = 6, hidhidnum = 6, outnum = 1; // innum = number of inputs, hidnum = number of hidden neurons, outnum = number of outputs
+	double m = 0.2; //momentum term
+	matrix<double> wh (hidnum, hidhidnum), whh (hidhidnum, innum), wo (outnum, hidnum), wh_old(hidnum, hidhidnum,0), whh_old(hidhidnum, innum,0), wo_old(outnum, hidnum,0); //weight matrices for the hidden layer and the output layer
+	initWeights(wh); initWeights(wo); initWeights(whh);
+	double eta = 0.6, a = 1; //learning rate
+	std::ofstream errorfile, outputfile;
+	errorfile.open  ("set3_error.txt");
+	outputfile.open ("set3_output.txt");
+	
+	
+
+	for (unsigned int i = 0; i<5000; i++) {
+		Paar* cur = paarList[Tools::returnRandomI(0,7)]; //randomly pick a input/output pair
+		vector<double> zz = prod(whh,cur->input);
+		vector<double> outhidhid(hidhidnum);
+		sigmoid(zz,outhidhid);
+		vector<double> xx = prod(wh,outhidhid); //determine the output of the hidden layer
+		vector<double> outhid(hidnum); // initialize vector for hidden layer output
+		sigmoid(xx,outhid); // have to program this way because microsoft compiler complains if I pass a boost
+		vector<double> yy = prod(wo,outhid);
+		vector<double> out(outnum);
+		sigmoid(yy,out); // out is usually of length 1 because the final output is just from one neuron
+		vector<double> curout(1,cur->output);
+		vector<double> e = vector<double>(curout - out); // e is also of length one
+		vector<double> outdelta(1,e[0]*out[0]*(1-out[0]));
+		vector<double> onevech(hidnum,1);
+		vector<double> hiddelta = inner_prod(outhid,(onevech-outhid))*prod(trans(wo),outdelta);
+		vector<double> onevechh(hidhidnum,1);
+		vector<double> hidhiddelta = inner_prod(outhidhid,(onevechh-outhidhid))*prod(trans(wh),hiddelta);
+
+		wo += eta*outer_prod(outdelta,outhid) + m*wo_old;       //momentum term added
+		wh += eta*outer_prod(hiddelta,outhidhid) + m*wh_old;   //momentum term added
+		whh+= eta*outer_prod(hidhiddelta, cur->input) + m*whh_old;
+
+		wo_old = eta*outer_prod(outdelta,outhid);                   //save delta w for next iteration (momentum term)
+		wh_old = eta*outer_prod(hiddelta,outhidhid);
+		whh_old = eta*outer_prod(hidhiddelta, cur->input);
+		
+		double oout = out[0];
+		errorfile  << "e^2:\t"  << inner_prod(e,e) << std::endl;
+		outputfile <<  "calc out:\t" << oout     << "\t" << cur->output  << std::endl;
+
+	}
+
+\end{lstlisting}
+
+\subsection{Zwei versteckte Schichten mit 3 m"oglichen Outputs}
+\begin{lstlisting}
+void Tetris_2hlayers() {
+	int N = 9;
+	Paar p0(N), p1(N), p2(N), p3(N), p4(N), p5(N), p6(N), p7(N), p8(N), p9(N), p10(N), p11(N), p12(N), p13(N); //p0-3 are L's, p4-7 are Squares's, N is the length of the input, output length is always one
+	
+	
+	// intermediate vectors - easier to assign a list of values. they then get copied to boost vectors
+	std::vector<double> vvL0, vvL1, vvL2, vvL3, vvS0, vvS1, vvS2, vvS3, vvZ0, vvZ1, vvZ2, vvZ3, vvI0, vvI1;
+	vvL0 += 0.9, 0.1, 0.1, 0.9, 0.1, 0.1, 0.9, 0.9, 0.1;
+	vvL1 += 0.1, 0.1, 0.1, 0.1, 0.1, 0.9, 0.9, 0.9, 0.9;
+	vvL2 += 0.1, 0.9, 0.9, 0.1, 0.1, 0.9, 0.1, 0.1, 0.9;
+	vvL3 += 0.9, 0.9, 0.9, 0.9, 0.1, 0.1, 0.1, 0.1, 0.1;
+
+	vvS0 += 0.1, 0.1, 0.1, 0.9, 0.9, 0.1, 0.9, 0.9, 0.1;
+	vvS1 += 0.1, 0.1, 0.1, 0.1, 0.9, 0.9, 0.1, 0.9, 0.9;
+	vvS2 += 0.1, 0.9, 0.9, 0.1, 0.9, 0.9, 0.1, 0.1, 0.1;
+	vvS3 += 0.9, 0.9, 0.1, 0.9, 0.9, 0.1, 0.1, 0.1, 0.1;
+
+	vvZ0 += 0.1, 0.9, 0.1, 0.9, 0.9, 0.1, 0.9, 0.1, 0.1;
+	vvZ1 += 0.1, 0.1, 0.1, 0.9, 0.9, 0.1, 0.1, 0.9, 0.9;
+	vvZ2 += 0.1, 0.1, 0.9, 0.1, 0.9, 0.9, 0.1, 0.9, 0.1;
+	vvZ3 += 0.9, 0.9, 0.1, 0.1, 0.9, 0.9, 0.1, 0.1, 0.1;
+
+	vvI0 += 0.1, 0.9, 0.1, 0.1, 0.9, 0.1, 0.1, 0.9, 0.1;
+	vvI1 += 0.1, 0.1, 0.1, 0.9, 0.9, 0.9, 0.1, 0.1, 0.1;
+
+	copyToBoost(vvI0,p12.input); p12.output = 0.6;
+	copyToBoost(vvI1,p13.input); p13.output = 0.6;
+
+	copyToBoost(vvZ0,p8.input); p8.output = 0.4;
+	copyToBoost(vvZ1,p9.input); p9.output = 0.4;
+	copyToBoost(vvZ2,p10.input); p10.output = 0.4;
+	copyToBoost(vvZ3,p11.input); p11.output = 0.4;
+
+	copyToBoost(vvL0,p0.input); p0.output = 0.1;
+	copyToBoost(vvL1,p1.input); p1.output = 0.1;
+	copyToBoost(vvL2,p2.input); p2.output = 0.1;
+	copyToBoost(vvL3,p3.input); p3.output = 0.1;
+
+	copyToBoost(vvS0,p4.input); p4.output = 0.9;
+	copyToBoost(vvS1,p5.input); p5.output = 0.9;
+	copyToBoost(vvS2,p6.input); p6.output = 0.9;
+	copyToBoost(vvS3,p7.input); p7.output = 0.9;
+
+
+	std::vector<Paar*> paarList;
+
+	paarList.push_back(&p0);
+	paarList.push_back(&p1);
+	paarList.push_back(&p2);
+	paarList.push_back(&p3);
+	paarList.push_back(&p4);
+	paarList.push_back(&p5);
+	paarList.push_back(&p6);
+	paarList.push_back(&p7);
+	/* paarList.push_back(&p8);
+	paarList.push_back(&p9);
+	paarList.push_back(&p10);
+	paarList.push_back(&p11); */
+	paarList.push_back(&p12);
+	paarList.push_back(&p13);
+
+	unsigned int innum = 9, hidnum = 24, hidhidnum = 12, outnum = 1; // innum = number of inputs, hidnum = number of hidden neurons, outnum = number of outputs
+	double m = 0.3; //momentum term
+	matrix<double> wh (hidnum, hidhidnum), whh (hidhidnum, innum), wo (outnum, hidnum), wh_old(hidnum, hidhidnum,0), whh_old(hidhidnum, innum,0), wo_old(outnum, hidnum,0); //weight matrices for the hidden layer and the output layer
+	initWeights(wh); initWeights(wo); initWeights(whh);
+	double eta = 0.3, a = 1; //learning rate
+	std::ofstream errorfile, outputfile;
+	errorfile.open  ("set1_error.txt");
+	outputfile.open ("set1_output.txt");
+	
+	
+
+	for (unsigned int i = 0; i<30000; i++) {
+		Paar* cur = paarList[Tools::returnRandomI(0,9)]; //randomly pick a input/output pair
+		vector<double> zz = prod(whh,cur->input);
+		vector<double> outhidhid(hidhidnum);
+		sigmoid(zz,outhidhid);
+		vector<double> xx = prod(wh,outhidhid); //determine the output of the hidden layer
+		vector<double> outhid(hidnum); // initialize vector for hidden layer output
+		sigmoid(xx,outhid); // have to program this way because microsoft compiler complains if I pass a boost
+		vector<double> yy = prod(wo,outhid);
+		vector<double> out(outnum);
+		sigmoid(yy,out); // out is usually of length 1 because the final output is just from one neuron
+		vector<double> curout(1,cur->output);
+		vector<double> e = vector<double>(curout - out); // e is also of length one
+		vector<double> outdelta(1,e[0]*out[0]*(1-out[0]));
+		vector<double> onevech(hidnum,1);
+		vector<double> hiddelta = inner_prod(outhid,(onevech-outhid))*prod(trans(wo),outdelta);
+		vector<double> onevechh(hidhidnum,1);
+		vector<double> hidhiddelta = inner_prod(outhidhid,(onevechh-outhidhid))*prod(trans(wh),hiddelta);
+
+		wo += eta*outer_prod(outdelta,outhid) + m*wo_old;       //momentum term added
+		wh += eta*outer_prod(hiddelta,outhidhid) + m*wh_old;   //momentum term added
+		whh+= eta*outer_prod(hidhiddelta, cur->input) + m*whh_old;
+
+		wo_old = eta*outer_prod(outdelta,outhid);                   //save delta w for next iteration (momentum term)
+		wh_old = eta*outer_prod(hiddelta,outhidhid);
+		whh_old = eta*outer_prod(hidhiddelta, cur->input);
+		
+		double oout = out[0];
+		errorfile  << "e^2:\t"  << inner_prod(e,e) << std::endl;
+		outputfile <<  "calc out:\t" << oout     << "\t" << cur->output  << std::endl;
+		cur = NULL;
+		delete cur;
+
+	}
+
+
+\end{lstlisting}
+
+\subsection{Tools.h}
+
+\begin{lstlisting}
+/* A General library of often used functions such as random numbers, waiting for enter */
+
+#include <random>
+
+class Tools {
+
+public:
+	static double returnRandomD(double start, double end) {
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_real_distribution<> dis(start,end);
+		return dis(gen);
+	}
+
+	static int returnRandomI(int start, int end) {
+		std::random_device rd;
+		std::mt19937 gen(rd());
+		std::uniform_int_distribution<> dis(start,end);
+		return dis(gen);
+	}
+
+	static void PressEnterToContinue() {
+		int c;
+		printf( "Press ENTER to continue... " );
+		fflush( stdout );
+		do c = getchar(); while ((c != '\n') && (c != EOF));
+  }
+};
+\end{lstlisting}
+
+\subsection{Paar.h}
+\begin{lstlisting}
+#include <stdio.h>
+#include <math.h>
+#include <boost/numeric/ublas/matrix.hpp>
+#include <boost/numeric/ublas/vector.hpp>
+#include <boost/numeric/ublas/io.hpp>
+#include <fstream>
+
+class Paar {
+public:
+	Paar(int n) { input.resize(n);
+	}
+	boost::numeric::ublas::vector< double > input;
+	double  output;
+private:
+
+};
+
+\end{lstlisting}
+\section{Referenzen}
+\bibliography{refs}
+
 \end{document}
